@@ -15,9 +15,9 @@ Note that we only use several pre- or post-processing functions in StarDist.
 ## Prepare the datasets
 
 ```
-Download DSB2018 used in stardist from https://github.com/stardist/stardist/releases/download/0.1.0/dsb2018.zip
-Download PanNuke from https://data.broadinstitute.org/bbbc/BBBC006 (In CPP-Net, we only use the "BBBC006_v1_images_z_16" images.)
-Download PanNuke from https://jgamper.github.io/PanNukeDataset/
+Download DSB2018 used in stardist from [https://github.com/stardist/stardist/releases/download/0.1.0/dsb2018.zip][https://github.com/stardist/stardist/releases/download/0.1.0/dsb2018.zip]
+Download BBBC006 from [https://data.broadinstitute.org/bbbc/BBBC006][https://data.broadinstitute.org/bbbc/BBBC006] (In CPP-Net, we only use the "BBBC006_v1_images_z_16" images.)
+Download PanNuke from [https://jgamper.github.io/PanNukeDataset][https://jgamper.github.io/PanNukeDataset]
 ```
 
 The details of separting the training / validation / test datasets can be found in reorganize_datasets/reorganize*.py.
@@ -44,11 +44,11 @@ Modify the DATA_PATH in ./feature_extractor/main_shape.py
     python feature_extractor/main_shape.py --gpuid 0
 ```
 
-## Train and Eval
+## Train
 
 Modify the SAP_Weight_path in ./cppnet/main_cppnet_dsb.py after the training process of SAP model
 
-or set SAP_Weight_path=None to ignore the SAP Loss
+Or set SAP_Weight_path=None to ignore the SAP Loss
 
 Modify the DATA_PATH in ./cppnet/main_cppnet_dsb.py
 
@@ -57,11 +57,18 @@ Modify the DATA_PATH in ./cppnet/main_cppnet_dsb.py
     python cppnet/main_cppnet_dsb.py --gpuid 0
 ```
 
-Modify the MODEL_WEIGHT_PATH in ./cppnet/main_cppnet_dsb.py after the training process of CPP-Net
 
-Modify the DATASET_PATH_IMAGE and DATASET_PATH_LABEL in ./cppnet/main_cppnet_dsb.py
+## Eval
+
+
+Modify the MODEL_WEIGHT_PATH in ./cppnet/predict_eval.py after the training process of CPP-Net
+
+Modify the DATASET_PATH_IMAGE and DATASET_PATH_LABEL in ./cppnet/predict_eval.py
 (e.g., DATASET_PATH_IMAGE=DATA_PATH/test/images and DATASET_PATH_LABEL=DATA_PATH/test/masks)
 
+```
+    python cppnet/predict_eval.py --gpuid 0
+```
 
 
 ### Pytorch StarDist
