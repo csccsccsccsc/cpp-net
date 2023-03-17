@@ -68,7 +68,7 @@ class DSB2018Dataset(Dataset):
 
         return image, obj_probabilities, distances
 
-def getDataLoaders(n_rays, max_dist, root_dir, type_list=['train', 'val'], image_flag='images', mask_flag='masks', batch_size=1, train_crop=None, test_crop=None, resz=None):
+def getDataLoaders(n_rays, max_dist, root_dir, type_list=['train', 'test'], image_flag='images', mask_flag='masks', batch_size=1, train_crop=None, test_crop=None, resz=None):
     trainset = DSB2018Dataset(root_dir=root_dir+'/'+type_list[0]+'/', n_rays=n_rays, max_dist=max_dist, if_training=True, crop=train_crop, resz=resz, image_flag=image_flag, mask_flag=mask_flag)
     testset = DSB2018Dataset(root_dir=root_dir+'/'+type_list[1]+'/', n_rays=n_rays, max_dist=max_dist, if_training=False, crop=test_crop, resz=resz, image_flag=image_flag, mask_flag=mask_flag)
     trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=4)

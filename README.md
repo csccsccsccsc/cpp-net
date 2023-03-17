@@ -9,16 +9,18 @@
 Note that we only use several pre- or post-processing functions in StarDist.
 
 
-## Prepare the related datasets
+## Prepare the datasets
 ```
-    DATA_PATH/train/images
-    DATA_PATH/val/images
-    DATA_PATH/test/images
-    DATA_PATH/train/masks
-    DATA_PATH/val/masks
-    DATA_PATH/test/masks
+    DATA_PATH/train/images/*.tif
+    DATA_PATH/val/images/*.tif
+    DATA_PATH/test/images/*.tif
+    DATA_PATH/train/masks/*.tif
+    DATA_PATH/val/masks/*.tif
+    DATA_PATH/test/masks/*.tif
+    ...
 ```
 
+Change "type_list" in the function getDataLoaders (in cppnet/dataloader_custom.py and feature_extractor/dataloader_aug.py) according to the names of your dataset splits.
 
 
 ## Prepare the instance shape-aware feature extractor
@@ -26,23 +28,24 @@ Note that we only use several pre- or post-processing functions in StarDist.
 Modify the DATA_PATH in ./feature_extractor/main_shape.py
 
 ```
-    python main_shape.py --gpuid 0
+    python feature_extractor/main_shape.py --gpuid 0
 ```
 
 ## Train and Eval
 
 Modify the SAP_Weight_path in ./cppnet/main_cppnet_dsb.py after the training process of SAP model
 
+or set SAP_Weight_path=None to ignore the SAP Loss
+
 Modify the DATA_PATH in ./cppnet/main_cppnet_dsb.py
 
 ```
-    python main_cppnet_dsb.py --gpuid 0
+    python cppnet/main_cppnet_dsb.py --gpuid 0
 ```
 
 Modify the MODEL_WEIGHT_PATH in ./cppnet/main_cppnet_dsb.py after the training process of CPP-Net
 
 Modify the DATASET_PATH_IMAGE and DATASET_PATH_LABEL in ./cppnet/main_cppnet_dsb.py
-
 (e.g., DATASET_PATH_IMAGE=DATA_PATH/test/images and DATASET_PATH_LABEL=DATA_PATH/test/masks)
 
 

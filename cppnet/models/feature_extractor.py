@@ -5,6 +5,7 @@ import torch.nn as nn
 from .unet_parts_gn import *
 import torch.nn.init as init
 
+# The encoder only
 class Feature_Extractor(nn.Module):
     def __init__(self, n_channels, n_features=32):
         super(Feature_Extractor, self).__init__()

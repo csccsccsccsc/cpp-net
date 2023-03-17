@@ -74,8 +74,10 @@ class CPPNet(nn.Module):
         confidence_refined = self.conv_1_confidence(confidence_refined)
         confidence_refined = confidence_refined.view(b, c, k, h, w).permute([0,2,1,3,4])
         confidence_refined = F.softmax(confidence_refined, dim=1)
-        if return_conf:
+        if self.return_conf:
             out_conf = [out_confidence, confidence_refined]
+        else:
+            out_conf = None
         ray_refined = (ray_refined*confidence_refined).sum(dim=1)
 
         out_ray = self.final_activation_ray(out_ray)

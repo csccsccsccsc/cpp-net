@@ -1,5 +1,5 @@
 ﻿import os
-print('Working dir',os.getcwd())
+print('Working dir', os.getcwd())
 from load_save_model import save_model
 from train_sampling_refine_withgt_separate_metric import Trainer
 import torch.optim
@@ -14,7 +14,7 @@ import numpy as np
 import argparse
 
 
-def run(data_path, nc_in=1, init_lr=1e-4, n_rays=32, SAP_weight_path=SAP_weight_path, n_sampling=6, K=5):
+def run(data_path, nc_in=1, init_lr=1e-4, n_rays=32, SAP_weight_path=None, n_sampling=6, K=5):
     crop_sz = None
     print(n_sampling, K)
     erosion_factor_list = [float(i+1)/n_sampling for i in range(n_sampling)]
@@ -22,21 +22,26 @@ def run(data_path, nc_in=1, init_lr=1e-4, n_rays=32, SAP_weight_path=SAP_weight_
 
     for irnd in range(K):
         
-        Trainloader, Testloader = dataloader_aug.getDataLoaders(n_rays, max_dist=None, root_dir=data_path)
+        Trainloader, Testloader = dataloader_custom.getDataLoaders(n_rays, max_dist=None, root_dir=data_path)
         
         model = CPPNet(nc_in, n_rays, erosion_factor_list=erosion_factor_list)
 
-        SAP_weight = torch.load(SAP_weight_path)
-        SAP_model = Feature_Extractor(n_rays+1, 32)
-        SAP_model_weight = SAP_model.state_dict()
-        for k, v in SAP_weight.items():
-            if k in SAP_model_weight.keys():
-                SAP_model_weight.update({k:v})
-                print('Loaded: ', k, v.shape)
-        SAP_model.load_state_dict(SAP_model_weight)
-        SAP_model = SAP_model.cuda()
-        SAP_model.eval()
-        loss = L1BCELoss(SAP_model)
+        if SAP_weight_path is not None:
+            SAP_weight = torch.load(SAP_weight_path)
+            SAP_model = Feature_Extractor(n_rays+1, 32)
+            SAP_model_weight = SAP_model.state_dict()
+            for k, v in SAP_weight.items():
+                if k in SAP_model_weight.keys():
+                    SAP_model_weight.update({k:v})
+                    print('Loaded: ', k, v.shape)
+            SAP_model.load_state_dict(SAP_model_weight)
+            SAP_model = SAP_model.cuda()
+            SAP_model.eval()
+            loss_scale = [1,1,1,1]
+        else:
+            SAP_model = None
+            loss_scale = [1,1,1]
+        loss = L1BCELoss(SAP_model, loss_scale)
 
         model_name='UNet2D_sampling_ensemble_n' + str(len(erosion_factor_list)) + '_r' + str(irnd) + '_weight_correct_conf_train3' + '_' + str(n_sampling) + '_withseg' + '_SAP_loss' + '_Others'
         print('model='+model_name)
@@ -69,8 +74,8 @@ def run(data_path, nc_in=1, init_lr=1e-4, n_rays=32, SAP_weight_path=SAP_weight_
         save_model(model, trainMetric_to_file, testMetric_to_file, trainloss_to_file, testloss_to_file, Parameters, model_name,train_mode,dataset,plot=False,**kwargs)
 
 
-DATA_PATH = 'DATASET PATH'
-SAP_Weight_path = 'FEATURE EXTRACTOR WEIGHT PATH'
+DATA_PATH = '/data/cong/datasets/dsb2018/dsb2018_in_stardist/dsb2018/dataset_split_for_training'
+SAP_Weight_path = None#  '/data/cong/workplace/stardist/shape_project/DSB2018_aug/StarDist2Others_32_UNet2D_32d_rnd0/UNet2D_32d_rnd0_StarDist2Others_32_DSB2018_aug.t7'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

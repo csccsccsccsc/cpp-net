@@ -22,4 +22,8 @@ class InstanceLoss(torch.nn.Module):
         else:
             segbndloss = 0.0
 
-        return self.scale[0]*segbndloss + self.scale[1]*bboxloss
+        loss = self.scale[0]*segbndloss + self.scale[1]*bboxloss
+        print('loss: {:.5f}, segbndloss: {:.5f}, bboxloss: {:.5f}, '\
+            .format(loss, segbndloss, bboxloss, ))
+
+        return loss

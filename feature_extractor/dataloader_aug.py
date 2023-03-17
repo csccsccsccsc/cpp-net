@@ -9,7 +9,7 @@ import random
 from scipy import ndimage
 
 class DSB2018Dataset(Dataset):
-    def __init__(self, root_dir, n_rays, max_dist=None, if_training=False, resz=None):
+    def __init__(self, root_dir, n_rays, max_dist=65, if_training=False, resz=None):
         self.raw_files = os.listdir(os.path.join(root_dir,'images'))
         self.target_files = os.listdir( os.path.join(root_dir,'masks'))
         self.raw_files.sort()
@@ -78,7 +78,7 @@ class DSB2018Dataset(Dataset):
 
         return input_stardist, segbnd, bbox
 
-def getDataLoaders(n_rays, max_dist, root_dir, type_list=['train', 'test'], batch_size=1, resz=None):
+def getDataLoaders(n_rays, root_dir, type_list=['train', 'test'], batch_size=1, resz=None, max_dist=65,):
     trainset = DSB2018Dataset(root_dir=root_dir+'/'+type_list[0]+'/', n_rays=n_rays, max_dist=max_dist, if_training=True, resz=resz)
     testset = DSB2018Dataset(root_dir=root_dir+'/'+type_list[1]+'/', n_rays=n_rays, max_dist=max_dist, if_training=False, resz=resz)
     trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=4)

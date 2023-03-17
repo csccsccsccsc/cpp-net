@@ -1,6 +1,5 @@
 import torch
 import torch.nn.functional as F
-from SamplingFeatures import SamplingFeatures
 
 
 def dice_loss(pred, target, eps=1e-7):
@@ -18,11 +17,13 @@ def dice_loss(pred, target, eps=1e-7):
 class L1Loss_List_withSAP_withSeg(torch.nn.Module):
     def __init__(self, feature_extractor=None, scale=[1,1,1,1]):
         super(L1Loss_List_withSAP_withSeg, self).__init__()
-        assert len(scale)==4
+        
         self.scale = scale
         self.feature_extractor = feature_extractor
-        if self.scale[3] > 0:
-            assert(self.feature_extractor is not None)
+        if self.feature_extractor is not None:
+            assert len(scale)==4
+        else:
+            assert len(scale)==3
     def forward(self, prediction, target_dists, **kwargs):
 
         prob =  kwargs.get('labels', None)
@@ -50,7 +51,7 @@ class L1Loss_List_withSAP_withSeg(torch.nn.Module):
 
         metric = loss.data.clone().cpu()
 
-        if self.scale[3] > 0:
+        if self.feature_extractor is not None:
             self.feature_extractor.zero_grad()
             sap_loss = 0.0
             f_target = self.feature_extractor(torch.cat((prob, target_dists), dim=1))
@@ -58,8 +59,10 @@ class L1Loss_List_withSAP_withSeg(torch.nn.Module):
                 f_pred = self.feature_extractor(torch.cat((pred_probs[-1]*pred_segs[-1], i_dist*pred_segs[-1]), dim=1))
                 sap_loss += F.l1_loss(f_pred, f_target)
             loss += self.scale[3]*sap_loss
+        else:
+            sap_loss = 0.0
 
-        # print('loss: {:.5f}, metric: {:.5f}, l1: {:.5f}, bce: {:.5f}, seg: {:.5f}, sap: {:.5f}'\
-        #     .format(loss.item(), metric.item(), l1loss.item(), bceloss.item(), segloss.item(), sap_loss.item()))
+        print('loss: {:.5f}, metric: {:.5f}, l1: {:.5f}, bce: {:.5f}, seg: {:.5f}, sap: {:.5f}'\
+            .format(loss, metric, l1loss, bceloss, segloss, sap_loss))
 
         return loss, metric
