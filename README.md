@@ -15,9 +15,9 @@ Note that we only use several pre- or post-processing functions in StarDist.
 ## Prepare the datasets
 
 ```
-Download DSB2018 used in stardist from [https://github.com/stardist/stardist/releases/download/0.1.0/dsb2018.zip][https://github.com/stardist/stardist/releases/download/0.1.0/dsb2018.zip]
-Download BBBC006 from [https://data.broadinstitute.org/bbbc/BBBC006][https://data.broadinstitute.org/bbbc/BBBC006] (In CPP-Net, we only use the "BBBC006_v1_images_z_16" images.)
-Download PanNuke from [https://jgamper.github.io/PanNukeDataset][https://jgamper.github.io/PanNukeDataset]
+Download DSB2018 used in stardist from [https://github.com/stardist/stardist/releases/download/0.1.0/dsb2018.zip](https://github.com/stardist/stardist/releases/download/0.1.0/dsb2018.zip)
+Download BBBC006 from [https://data.broadinstitute.org/bbbc/BBBC006](https://data.broadinstitute.org/bbbc/BBBC006) (In CPP-Net, we only use the "BBBC006_v1_images_z_16" images.)
+Download PanNuke from [https://jgamper.github.io/PanNukeDataset](https://jgamper.github.io/PanNukeDataset)
 ```
 
 The details of separting the training / validation / test datasets can be found in reorganize_datasets/reorganize*.py.
