@@ -6,7 +6,7 @@ import torch.optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from models.cpp_net import CPPNet
 from models.feature_extractor import Feature_Extractor
-from distance_loss_sampling_refine import L1Loss_List_withSAP_withSeg as L1BCELoss
+from train import L1Loss_List_withSAP_withSeg as L1BCELoss
 import dataloader_custom
 import random
 import numpy as np
@@ -74,8 +74,8 @@ def run(data_path, nc_in=1, init_lr=1e-4, n_rays=32, SAP_weight_path=None, n_sam
         save_model(model, trainMetric_to_file, testMetric_to_file, trainloss_to_file, testloss_to_file, Parameters, model_name,train_mode,dataset,plot=False,**kwargs)
 
 
-DATA_PATH = '/data/cong/datasets/dsb2018/dsb2018_in_stardist/dsb2018/dataset_split_for_training'
-SAP_Weight_path = None#  '/data/cong/workplace/stardist/shape_project/DSB2018_aug/StarDist2Others_32_UNet2D_32d_rnd0/UNet2D_32d_rnd0_StarDist2Others_32_DSB2018_aug.t7'
+DATA_PATH = ''
+SAP_Weight_path = None#  
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
