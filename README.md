@@ -10,6 +10,12 @@ Note that we only use several pre- or post-processing functions in StarDist.
 
 
 ## Prepare the datasets
+
+The details of separting the training / validation / test datasets can be found in reorganize_datasets/reorganize*.py.
+
+Change "type_list" in the function getDataLoaders (in cppnet/dataloader_custom.py and feature_extractor/dataloader_aug.py) according to the names of your dataset splits (e.g., "split1" for training / "split2" for validation in PanNuke).
+
+
 ```
     DATA_PATH/train/images/*.tif
     DATA_PATH/val/images/*.tif
@@ -20,7 +26,6 @@ Note that we only use several pre- or post-processing functions in StarDist.
     ...
 ```
 
-Change "type_list" in the function getDataLoaders (in cppnet/dataloader_custom.py and feature_extractor/dataloader_aug.py) according to the names of your dataset splits.
 
 
 ## Prepare the instance shape-aware feature extractor

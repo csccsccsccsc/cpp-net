@@ -45,7 +45,7 @@ def run(data_path, n_rays, nc_in, nd_features, loss_scale, loss_type, init_lr=1e
     save_model(model,trainMetric_to_file,testMetric_to_file,trainloss_to_file,testloss_to_file,Parameters,model_name,train_mode,dataset, plot=False,**kwargs)
 
 
-DATA_PATH = ''
+DATA_PATH = '/data/cong/datasets/dsb2018/dsb2018_in_stardist/dsb2018/dataset_split_for_training'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
