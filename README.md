@@ -1,5 +1,10 @@
 ﻿# CPP-Net: Context-aware Polygon Proposal Network for Nucleus Segmentation
 
+## Paper
+The original paper of CPP-Net can be found in [TIP](https://ieeexplore.ieee.org/document/10024152) or [arxiv](https://arxiv.org/pdf/2102.06867.pdf).
+
+
+
 ## Requirements
 ```
     pytorch==1.11.0
