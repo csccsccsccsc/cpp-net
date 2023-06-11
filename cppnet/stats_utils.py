@@ -17,7 +17,9 @@ def get_fast_aji(true, pred):
 
     """
 
-    if true.any and not(pred.any()):
+    if true.any() and not(pred.any()):
+        return 0.0
+    if pred.any() and not(true.any()):
         return 0.0
 
     true = np.copy(true)  # ? do we need this
@@ -106,9 +108,12 @@ def get_fast_aji_plus(true, pred):
 
     """
 
-    if true.any and not(pred.any()):
+    if true.any() and not(pred.any()):
         return 0.0
-
+    if pred.any() and not(true.any()):
+        return 0.0
+    if not(pred.any()) and not(true.any()):
+        return 1.0
 
     true = np.copy(true)  # ? do we need this
     pred = np.copy(pred)
@@ -208,9 +213,14 @@ def get_fast_pq(true, pred, match_iou=0.5):
     """
     assert match_iou >= 0.0, "Cant' be negative"
 
-    if true.any and not(pred.any()):
+    if true.any() and not(pred.any()):
         return 0.0
+    if pred.any() and not(true.any()):
+        return 0.0
+    if not(pred.any()) and not(true.any()):
+        return 1.0
 
+        
     true = np.copy(true)
     pred = np.copy(pred)
     true_id_list = list(np.unique(true))
@@ -294,8 +304,12 @@ def get_fast_pq(true, pred, match_iou=0.5):
 def get_fast_dice_2(true, pred):
     """Ensemble dice."""
 
-    if true.any and not(pred.any()):
+    if true.any() and not(pred.any()):
         return 0.0
+    if pred.any() and not(true.any()):
+        return 0.0
+    if not(pred.any()) and not(true.any()):
+        return 1.0
 
     true = np.copy(true)
     pred = np.copy(pred)

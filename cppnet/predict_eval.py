@@ -216,8 +216,6 @@ DATASET_PATH_IMAGE = 'DATA PATH/test/images/*.tif'
 DATASET_PATH_LABEL = 'DATA PATH/test/masks/*.tif'
 
 MODEL_WEIGHT_PATH = ''
-n_rays = 32
-nc_in = 1
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -228,10 +226,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpuid)
-    
-    DATASET_PATH_IMAGE, DATASET_PATH_LABEL,
-    args.nc_in, args.n_rays, args.n_sampling, MODEL_WEIGHT_PATH,
-
 
     run(
         DATASET_PATH_IMAGE, DATASET_PATH_LABEL,

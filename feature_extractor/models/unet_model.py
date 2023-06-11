@@ -6,7 +6,7 @@ from .unet_parts_gn import *
 import torch.nn.init as init
 
 class UNet(nn.Module):
-    def __init__(self, n_channels, n_features=32, loss_type='others'):
+    def __init__(self, n_channels, n_features=32, loss_type='others', n_cls=0):
         super(UNet, self).__init__()
         self.inc = inconv(n_channels, n_features)
         self.down1 = down(n_features, n_features*2)
@@ -30,6 +30,13 @@ class UNet(nn.Module):
         self.final_activation_prob = nn.Sigmoid()
         self.final_activation_ray = nn.ReLU()
 
+        self.n_cls = n_cls
+        if n_cls > 1:
+            self.features_cls = nn.Conv2d(n_features, n_features, 3, padding=1)
+            self.out_cls = outconv(n_features, n_cls)
+            self.final_activation_cls = nn.Softmax(dim=1)
+
+
     def forward(self, x):
         x0 = self.inc(x)
         x1 = self.down1(x0)
@@ -47,9 +54,15 @@ class UNet(nn.Module):
         if self.loss_type == 'others' or self.loss_type=='bbox':
             x_bbox = self.final_activation_ray(self.out_bbox(self.features_bbox(x)))
 
+
         if self.loss_type == 'others':
-            return x_segbnd, x_bbox
+            outputs = [x_segbnd, x_bbox]
         elif self.loss_type == 'segbnd':
-            return x_segbnd, 0.0
+            outputs = [x_segbnd, 0.0]
         elif self.loss_type == 'bbox':
-            return 0.0, x_bbox
+            outputs = [0.0, x_bbox]
+
+        if self.n_cls > 1:
+            outputs.append(self.final_activation_cls(self.out_cls(self.features_cls(x))))
+
+        return outputs

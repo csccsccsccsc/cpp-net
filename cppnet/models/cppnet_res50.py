@@ -7,29 +7,28 @@ from .SamplingFeatures2 import SamplingFeatures
 
 class CPPNet(nn.Module):
 
-    def __init__(self, n_channels, n_rays, erosion_factor_list=[0.2, 0.4, 0.6, 0.8, 1.0], return_conf=False, with_seg=True, n_seg_cls=1):
+    def __init__(self, n_channels, n_rays, erosion_factor_list=[0.2, 0.4, 0.6, 0.8, 1.0], return_conf=False, with_seg=True, n_seg_cls=6):
         super(CPPNet, self).__init__()
-        self.inc = inconv(n_channels, 32)
-        self.down1 = down(32, 64)
-        self.down2 = down(64, 128)
-        self.down3 = down(128, 128)
-        self.up1 = up(256, 64, bilinear=True)
-        self.up2 = up(128, 32, bilinear=True)
-        self.up3 = up(64, 32, bilinear=True)
-        self.features = nn.Conv2d(32, 128, 3, padding=1)
-        self.out_prob = outconv(128, 1)
-        self.out_ray = outconv(128, n_rays)
-        self.conv_0_confidence = outconv(128, n_rays)
+
+        self.backbone = resnet50(True)
+        self.up1 = up(2048+1024, 1024, bilinear=True)
+        self.up2 = up(1024+512, 512, bilinear=True)
+        self.up3 = up(512+256, 256, bilinear=True)
+
+        self.features = nn.Conv2d(256, 256, 3, padding=1)
+        self.out_prob = outconv(256, 1)
+        self.out_ray = outconv(256, n_rays)
+        self.conv_0_confidence = outconv(256, n_rays)
         self.conv_1_confidence = outconv(1+len(erosion_factor_list), 1+len(erosion_factor_list))
         nn.init.constant_(self.conv_1_confidence.conv.bias, 1.0)
 
         self.with_seg = with_seg
         self.n_seg_cls = n_seg_cls
         if self.with_seg:
-            self.up1_seg = up(256, 64, bilinear=True)
-            self.up2_seg = up(128, 32, bilinear=True)
-            self.up3_seg = up(64, 32, bilinear=True)
-            self.out_seg = outconv(32, n_seg_cls)
+            self.up1_seg = up(2048+1024, 1024, bilinear=True)
+            self.up2_seg = up(1024+512, 512, bilinear=True)
+            self.up3_seg = up(512+256, 256, bilinear=True)
+            self.out_seg = outconv(256, n_seg_cls)
             if self.n_seg_cls == 1:
                 self.final_activation_seg = nn.Sigmoid()
             else:
@@ -45,10 +44,7 @@ class CPPNet(nn.Module):
         self.return_conf = return_conf
 
     def forward(self, img, gt_dist=None):
-        x1 = self.inc(img)
-        x2 = self.down1(x1)
-        x3 = self.down2(x2)
-        x4 = self.down3(x3)
+        x1, x2, x3, x4 = self.backbone(img.repeat(1,3,1,1))
         x = self.up1(x4, x3)
         x = self.up2(x, x2)
         x = self.up3(x, x1)
@@ -98,10 +94,8 @@ class CPPNet(nn.Module):
                 out_seg = self.final_activation_seg(out_seg)
             elif not self.training:
                 out_seg = self.final_activation_seg(out_seg)
-
         else:
             out_seg = None
-
 
         return [out_ray, ray_refined], [out_prob], [out_seg, ], [out_conf, ]
 

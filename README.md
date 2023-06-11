@@ -1,76 +1,65 @@
 ﻿# CPP-Net: Context-aware Polygon Proposal Network for Nucleus Segmentation
 
-## Paper
-The original paper of CPP-Net can be found in [TIP](https://ieeexplore.ieee.org/document/10024152) or [arxiv](https://arxiv.org/pdf/2102.06867.pdf).
-
 ## Requirements
 ```
     pytorch==1.11.0
     stardist==0.6.0
     csbdeep==0.6.3
 ```
-Note that we only use several pre- or post-processing functions in StarDist.
 
 
 ## Prepare the datasets
-
-Download DSB2018 used in stardist from https://github.com/stardist/stardist/releases/download/0.1.0/dsb2018.zip.
-
-Download BBBC006 from https://data.broadinstitute.org/bbbc/BBBC006.
-
-(In CPP-Net, we only use the "BBBC006_v1_images_z_16" images.)
-
-Download PanNuke from https://jgamper.github.io/PanNukeDataset.
-
-The details of separting the training / validation / test datasets can be found in reorganize_datasets/reorganize*.py.
-
-Change "type_list" in the function getDataLoaders (in cppnet/dataloader_custom.py and feature_extractor/dataloader_aug.py) according to the names of your dataset splits (e.g., "split1" for training / "split2" for validation in PanNuke).
-
-
 ```
-    DATA_PATH/train/images/*.tif
-    DATA_PATH/val/images/*.tif
-    DATA_PATH/test/images/*.tif
+    DATA_PATH/train/images/*.tif or *.png
+    DATA_PATH/val/images/*.tif or *.png
+    DATA_PATH/test/images/*.tif or *.png
     DATA_PATH/train/masks/*.tif
     DATA_PATH/val/masks/*.tif
     DATA_PATH/test/masks/*.tif
     ...
 ```
 
+Change "type_list" in the function getDataLoaders (in cppnet/dataloader_custom.py and feature_extractor/dataloader_aug.py) according to the names of your dataset splits.
+
+For the PanNuke dataset, you can change the path in pannuke_data_preproc/reorganize_dataset.py, and run the script.
+```
+    python pannuke_data_preproc/reorganize_dataset.py
+```
 
 ## Prepare the instance shape-aware feature extractor
 
-Modify the DATA_PATH in ./feature_extractor/main_shape.py
-
+Modify the DATA_PATH in ./feature_extractor/main_shape.py. Here, the parameter --n_cls includes both foreground classes and the background.
+Run the script like
 ```
-    python feature_extractor/main_shape.py --gpuid 0
+    python feature_extractor/main_shape.py --gpuid 0 --dataset DSB2018 --n_cls 1
+    python feature_extractor/main_shape.py --gpuid 0 --dataset PanNuke --n_cls 6
 ```
 
-## Train
+## Train and Eval
+
 
 Modify the SAP_Weight_path in ./cppnet/main_cppnet_dsb.py after the training process of SAP model
 
-Or set SAP_Weight_path=None to ignore the SAP Loss
+or set SAP_Weight_path=None to ignore the SAP Loss
 
 Modify the DATA_PATH in ./cppnet/main_cppnet_dsb.py
-
 
 ```
     python cppnet/main_cppnet_dsb.py --gpuid 0
 ```
 
+Modify the MODEL_WEIGHT_PATH in ./cppnet/main_cppnet_dsb.py after the training process of CPP-Net
 
-## Eval
-
-
-Modify the MODEL_WEIGHT_PATH in ./cppnet/predict_eval.py after the training process of CPP-Net
-
-Modify the DATASET_PATH_IMAGE and DATASET_PATH_LABEL in ./cppnet/predict_eval.py
+Modify the DATASET_PATH_IMAGE and DATASET_PATH_LABEL in ./cppnet/main_cppnet_dsb.py
 (e.g., DATASET_PATH_IMAGE=DATA_PATH/test/images and DATASET_PATH_LABEL=DATA_PATH/test/masks)
+
+Modify the path in cppnet/predict_eval.p, and run the script to evaluate model performances
 
 ```
     python cppnet/predict_eval.py --gpuid 0
 ```
+
+For each fold in PanNuke, use script cppnet/predict_eval_pannuke.py, and you can obtain a '.npy' file that includes predictions
 
 
 ### Pytorch StarDist

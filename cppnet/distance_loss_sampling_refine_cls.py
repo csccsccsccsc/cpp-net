@@ -15,15 +15,18 @@ def dice_loss(pred, target, eps=1e-7):
     return loss
 
 class L1Loss_List_withSAP_withSeg(torch.nn.Module):
-    def __init__(self, feature_extractor=None, scale=[1,1,1,1]):
+    def __init__(self, feature_extractor, scale=[1,1,1,1], cls_balance_mode=False):
         super(L1Loss_List_withSAP_withSeg, self).__init__()
-        
+        assert len(scale)==4
         self.scale = scale
         self.feature_extractor = feature_extractor
         if self.feature_extractor is not None:
             assert len(scale)==4
         else:
-            assert len(scale)==3
+            assert len(scale)==3        
+        self.cls_balance_mode = cls_balance_mode
+        assert(self.cls_balance_mode in [True, False])
+
     def forward(self, prediction, target_dists, **kwargs):
 
         prob =  kwargs.get('labels', None)
@@ -32,31 +35,36 @@ class L1Loss_List_withSAP_withSeg(torch.nn.Module):
 
         l1loss = 0.0
         bceloss = 0.0
-        
+        segloss = 0.0
         for i_dist in pred_dists:
             l1loss_map = F.l1_loss(i_dist, target_dists, reduction='none')
             l1loss += torch.mean(prob*l1loss_map)
         for i_prob in pred_probs:
             bceloss += F.binary_cross_entropy(i_prob, prob)
+        for i_seg in pred_segs:
+            if self.cls_balance_mode:
+                segloss_map = F.cross_entropy(i_seg, seg_target, reduction='none')
+                cur_segloss = 0.0
+                for ic in range(i_seg.shape[1]):
+                    icmask = (seg_target==ic).float()
+                    cur_segloss += ((icmask * segloss_map).sum()+1e-5) / (icmask.sum()+1e-5)
+                segloss += cur_segloss / i_seg.shape[1]
+                        + dice_loss(F.softmax(i_seg, dim=1), seg_target)
+            else:
+                segloss += F.cross_entropy(i_seg, seg_target) \
+                        + dice_loss(F.softmax(i_seg, dim=1), seg_target)
 
         loss = self.scale[0]*l1loss + self.scale[1]*bceloss
-
-        if self.scale[2] > 0:
-            segloss = 0.0
-            pred_segs = prediction[2]
-            seg = (prob>0).float()
-            for i_seg in pred_segs:
-                segloss += F.binary_cross_entropy(i_seg, seg)
-            loss += self.scale[2]*segloss
-
         metric = loss.data.clone().cpu()
+        loss += self.scale[2]*segloss
 
         if self.feature_extractor is not None:
             self.feature_extractor.zero_grad()
             sap_loss = 0.0
+            target_mask = (target_dists.max(dim=1, keepdim=True)[0]>0).float()
             f_target = self.feature_extractor(torch.cat((prob, target_dists), dim=1))
             for i_dist in pred_dists:
-                f_pred = self.feature_extractor(torch.cat((pred_probs[-1]*pred_segs[-1], i_dist*pred_segs[-1]), dim=1))
+                f_pred = self.feature_extractor(torch.cat((pred_probs[-1], i_dist*target_mask), dim=1))
                 sap_loss += F.l1_loss(f_pred, f_target)
             loss += self.scale[3]*sap_loss
         else:
