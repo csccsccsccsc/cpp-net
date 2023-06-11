@@ -21,9 +21,11 @@
 
 Change "type_list" in the function getDataLoaders (in cppnet/dataloader_custom.py and feature_extractor/dataloader_aug.py) according to the names of your dataset splits.
 
-For the PanNuke dataset, you can change the path in pannuke_data_preproc/reorganize_dataset.py, and run the script.
+Change the path in the script in reorganize_datasets, and run the script.
 ```
-    python pannuke_data_preproc/reorganize_dataset.py
+    python reorganize_datasets/reorganize_dsb2018.py
+    python reorganize_datasets/reorganize_bbbc006.py
+    python reorganize_datasets/reorganize_pannuke.py
 ```
 
 ## Prepare the instance shape-aware feature extractor
