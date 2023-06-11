@@ -19,14 +19,15 @@
     ...
 ```
 
-Change "type_list" in the function getDataLoaders (in cppnet/dataloader_custom.py and feature_extractor/dataloader_aug.py) according to the names of your dataset splits.
-
 Change the path in the script in reorganize_datasets, and run the script.
 ```
     python reorganize_datasets/reorganize_dsb2018.py
     python reorganize_datasets/reorganize_bbbc006.py
     python reorganize_datasets/reorganize_pannuke.py
 ```
+The download link can also be found in these scripts.
+
+Change "type_list" in the function getDataLoaders (in cppnet/dataloader_custom.py and feature_extractor/dataloader_aug.py) according to the names of your dataset splits.
 
 ## Prepare the instance shape-aware feature extractor
 
