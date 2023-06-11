@@ -5,7 +5,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 #######
-### 1) Download PanNuke from https://jgamper.github.io/PanNukeDataset/
+### 1) Download PanNuke from https://warwick.ac.uk/fac/cross_fac/tia/data/pannuke
 ### 2) Save each image and mask in the origianl ".npy" file as ".tif"
 
 for ifold in [1,2,3]:
