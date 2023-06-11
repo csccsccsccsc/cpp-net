@@ -8,6 +8,11 @@ warnings.filterwarnings('ignore')
 import tqdm
 import shutil
 
+# BBBC006:
+# Since we only use the in-focus images, the images can be downloaded from:
+# https://data.broadinstitute.org/bbbc/BBBC006/BBBC006_v1_images_z_16.zip
+# Also, we only evaluate the models on the Hoechst images, i.e., the '*_w1*.tif' images.
+
 img_dir = './BBBC006_v1_images_z_16'
 msk_dir = './BBBC006_v1_labels'
 save_img_dir = './reorganize_dataset'
